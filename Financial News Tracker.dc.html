@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:'Geist',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased;background:#09090b}
+input{font-family:inherit}
+::placeholder{color:var(--faint,#71717a)}
+@keyframes fnt-marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes fnt-pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.fnt-tape:hover .fnt-track{animation-play-state:paused}
+*::-webkit-scrollbar{width:10px;height:10px}
+*::-webkit-scrollbar-thumb{background:var(--border,#27272a);border-radius:8px;border:2px solid transparent;background-clip:padding-box}
+*::-webkit-scrollbar-track{background:transparent}
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:var(--bg,#09090b);color:var(--text,#fafafa);font-family:'Geist',sans-serif">
+
+  <sc-if value="{{ flags.showTape }}" hint-placeholder-val="{{ false }}">
+    <div class="fnt-tape" style="border-bottom:1px solid var(--border,#27272a);background:var(--panel,#0c0c0e);overflow:hidden;height:38px;display:flex;align-items:center">
+      <div class="fnt-track" style="display:flex;gap:28px;align-items:center;width:max-content;animation:fnt-marquee 64s linear infinite;padding-left:28px">
+        <sc-for list="{{ tape }}" as="t" hint-placeholder-count="12">
+          <div onClick="{{ t.onClick }}" style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12.5px;white-space:nowrap">
+            <span style="font-weight:600;font-family:'Geist Mono',monospace;color:var(--text,#fafafa)">{{ t.sym }}</span>
+            <span style="font-family:'Geist Mono',monospace;color:var(--muted,#a1a1aa)">{{ t.price }}</span>
+            <span style="{{ t.changeStyle }}">{{ t.arrow }} {{ t.change }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="display:flex;min-height:100vh">
+
+    <sc-if value="{{ flags.isDesktop }}" hint-placeholder-val="{{ true }}">
+      <aside style="width:248px;flex-shrink:0;border-right:1px solid var(--border,#27272a);background:var(--panel,#0c0c0e);padding:20px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:5px">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 10px 18px">
+          <div style="width:30px;height:30px;border-radius:9px;background:var(--brand,#22c55e);display:flex;align-items:center;justify-content:center;color:var(--brand-text,#04130a);font-weight:800;font-size:16px;font-family:'Geist Mono',monospace">F</div>
+          <div style="font-weight:700;font-size:16px;letter-spacing:-.01em">FNT<span style="color:var(--faint,#71717a);font-weight:500;font-size:12px;margin-left:6px">Tracker</span></div>
+        </div>
+        <sc-for list="{{ nav }}" as="item" hint-placeholder-count="4">
+          <button onClick="{{ item.onClick }}" style="{{ item.style }}" style-hover="background:var(--hover,#1f1f23);color:var(--text,#fafafa)">
+            <span style="display:flex;align-items:center">{{ item.iconEl }}</span>
+            <span>{{ item.label }}</span>
+          </button>
+        </sc-for>
+        <div style="margin-top:auto;padding:14px 10px 4px;border-top:1px solid var(--border,#27272a);font-size:11.5px;color:var(--faint,#71717a);line-height:1.5">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span style="width:7px;height:7px;border-radius:50%;background:var(--up,#22c55e);display:inline-block;animation:fnt-pulse 2s infinite"></span><span style="color:var(--muted,#a1a1aa);font-weight:500">Markets live</span></div>
+          Simulated data · demo only
+        </div>
+      </aside>
+    </sc-if>
+
+    <main style="flex:1;min-width:0;display:flex;flex-direction:column">
+      <header style="position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border,#27272a);background:color-mix(in oklab, var(--bg,#09090b) 80%, transparent);backdrop-filter:blur(10px)">
+        <div style="flex:1;min-width:0;display:flex;align-items:center;gap:10px">
+          <sc-if value="{{ flags.isMobile }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:9px"><div style="width:26px;height:26px;border-radius:8px;background:var(--brand,#22c55e);display:flex;align-items:center;justify-content:center;color:var(--brand-text,#04130a);font-weight:800;font-size:14px;font-family:'Geist Mono',monospace">F</div><span style="font-weight:700;font-size:15px">FNT</span></div>
+          </sc-if>
+          <sc-if value="{{ flags.isDesktop }}" hint-placeholder-val="{{ true }}">
+            <h1 style="margin:0;font-size:19px;font-weight:700;letter-spacing:-.02em">{{ pageTitle }}</h1>
+          </sc-if>
+        </div>
+        <button onClick="{{ toggleTheme }}" title="Toggle theme" style="width:38px;height:38px;border-radius:10px;border:1px solid var(--border,#27272a);background:var(--card,#161618);color:var(--muted,#a1a1aa);display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="color:var(--text,#fafafa);border-color:var(--faint,#71717a)">{{ themeIcon }}</button>
+        <button title="Alerts" style="width:38px;height:38px;border-radius:10px;border:1px solid var(--border,#27272a);background:var(--card,#161618);color:var(--muted,#a1a1aa);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative" style-hover="color:var(--text,#fafafa);border-color:var(--faint,#71717a)">{{ bellIcon }}<span style="position:absolute;top:9px;right:10px;width:6px;height:6px;border-radius:50%;background:var(--down,#f87171)"></span></button>
+        <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#3f3f46,#18181b);border:1px solid var(--border,#27272a);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#e4e4e7;font-family:'Geist Mono',monospace">JD</div>
+      </header>
+
+      <div style="flex:1;padding:22px;padding-bottom:104px;max-width:1340px;width:100%;margin:0 auto">
+
+        <!-- ========================= HOME ========================= -->
+        <sc-if value="{{ flags.isHome }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:22px">
+            <div>
+              <div style="color:var(--faint,#71717a);font-size:13px;font-weight:500">{{ today }}</div>
+              <h2 style="margin:3px 0 0;font-size:24px;font-weight:700;letter-spacing:-.02em">Good morning, Jordan</h2>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px">
+              <sc-for list="{{ indices }}" as="ix" hint-placeholder-count="8">
+                <div style="border:1px solid var(--border,#27272a);background:var(--card,#161618);border-radius:12px;padding:12px 14px">
+                  <div style="font-size:12px;color:var(--muted,#a1a1aa);font-weight:500;margin-bottom:5px">{{ ix.label }}</div>
+                  <div style="font-size:17px;font-weight:600;font-family:'Geist Mono',monospace;letter-spacing:-.01em">{{ ix.val }}</div>
+                  <div style="{{ ix.changeStyle }};margin-top:2px">{{ ix.arrow }} {{ ix.change }}</div>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="display:flex;flex-wrap:wrap;gap:18px">
+              <div style="flex:2 1 460px;min-width:0;display:flex;flex-direction:column;gap:18px">
+                <div style="border:1px solid var(--border,#27272a);background:var(--card,#161618);border-radius:14px;padding:18px">
+                  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+                    <div><div style="font-size:14px;font-weight:600">Market Overview</div><div style="font-size:12px;color:var(--faint,#71717a);margin-top:2px">FNT Composite · 30 days</div></div>
+                    <div style="{{ mc.changeStyle }};font-size:15px">{{ mc.arrow }} {{ mc.change }}</div>
+                  </div>
+                  <svg viewBox="0 0 1000 240" preserveAspectRatio="none" style="width:100%;height:196px;margin-top:12px;display:block">
+                    <defs><linearGradient id="mcg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" style="stop-color:var(--brand,#22c55e);stop-opacity:.26"></stop><stop offset="100%" style="stop-color:var(--brand,#22c55e);stop-opacity:0"></stop></linearGradient></defs>
+                    <path d="{{ mc.area }}" fill="url(#mcg)" stroke="none"></path>
+                    <path d="{{ mc.line }}" fill="none" style="stroke:var(--brand,#22c55e);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round"></path>
+                  </svg>
+                </div>
+
+                <div style="display:flex;flex-wrap:wrap;gap:18px">
+                  <div style="flex:1 1 240px;border:1px solid var(--border,#27272a);background:var(--card,#161618);border-radius:14px;padding:16px">
+                    <div style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;margin-bottom:10px;color:var(--up,#22c55e)">{{ upIcon }} Top Gainers</div>
+                    <div style="display:flex;flex-direction:column;gap:2px">
+                      <sc-for list="{{ gainers }}" as="g" hint-placeholder-count="4">
+                        <div onClick="{{ g.onClick }}" onKeyDown="{{ g.onKey }}" role="button" tabindex="0" style="display:flex;align-items:center;gap:10px;padding:7px 6px;border-radius:9px;cursor:pointer" style-hover="background:var(--hover,#1f1f23)">
+                          <span style="{{ g.badgeSm }}">{{ g.icon }}</span>
+                          <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;font-family:'Geist Mono',monospace">{{ g.sym }}</div></div>
+                          <svg viewBox="0 0 120 34" preserveAspectRatio="none" style="width:60px;height:22px"><polyline points="{{ g.spark }}" style="{{ g.sparkStyle }}"></polyline></svg>
+                          <div style="text-align:right"><div style="font-size:13px;font-weight:600;font-family:'Geist Mono',monospace">{{ g.price }}</div><div style="{{ g.changeStyle }}">{{ g.change }}</div></div>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                  <div style="flex:1 1 240px;border:1px solid var(--border,#27272a);background:var(--card,#161618);border-radius:14px;padding:16px">
+                    <div style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;margin-bottom:10px;color:var(--down,#f87171)">{{ downIcon }} Top Losers</div>
+                    <div style="display:flex;flex-direction:column;gap:2px">
+                      <sc-for list="{{ losers }}" as="g" hint-placeholder-count="4">
+                        <div onClick="{{ g.onClick }}" onKeyDown="{{ g.onKey }}" role="button" tabindex="0" style="display:flex;align-items:center;gap:10px;padding:7px 6px;border-radius:9px;cursor:pointer" style-hover="background:var(--hover,#1f1f23)">
+                          <span style="{{ g.badgeSm }}">{{ g.icon }}</span>
+                          <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;font-family:'Geist Mono',monospace">{{ g.sym }}</div></div>
+                          <svg viewBox="0 0 120 34" preserveAspectRatio="none" style="width:60px;height:22px"><polyline points="{{ g.spark }}" style="{{ g.sparkStyle }}"></polyline></svg>
+                          <div style="text-align:right"><div style="font-size:13px;font-weight:600;font-family:'Geist Mono',monospace">{{ g.price }}</div><div style="{{ g.changeStyle }}">{{ g.change }}</div></div>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:18px">
+                <div style="border:1px solid var(--border,#27272a);background:var(--card,#161618);border-radius:14px;padding:16px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><span style="font-size:14px;font-weight:600">Watchlist</span><button onClick="{{ goWatch }}" style="background:none;border:none;color:var(--brand,#22c55e);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer">View all</button></div>
+                  <sc-if value="{{ flags.hasWatch }}" hint-placeholder-val="{{ true }}">
+                    <div style="display:flex;flex-direction:column;gap:2px">
+                      <sc-for list="{{ watchMini }}" as="w" hint-placeholder-count="4">
+                        <div onClick="{{ w.onClick }}" onKeyDown="{{ w.onKey }}" role="button" tabindex="0" style="display:flex;align-items:center;gap:10px;padding:8px 6px;border-radius:9px;cursor:pointer" style-hover="background:var(--hover,#1f1f23)">
+                          <span style="{{ w.badgeSm }}">{{ w.icon }}</span>
+                          <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;font-family:'Geist Mono',monospace">{{ w.sym }}</div><div style="font-size:11px;color:var(--faint,#71717a);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ w.name }}</div></div>
+                          <div style="text-align:right"><div style="font-size:13px;font-weight:600;font-family:'Geist Mono',monospace">{{ w.price }}</div><div style="{{ w.changeStyle }}">{{ w.arrow }} {{ w.change }}</div></div>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ flags.noWatch }}" hint-placeholder-val="{{ false }}">
+                    <div style="text-align:center;padding:18px 8px;color:var(--faint,#71717a);font-size:13px">No symbols yet — browse Markets to add some.</div>
+                  </sc-if>
+                </div>
+
+                <div style="border:1px solid var(--border,#27272a);background:var(--card,#161618);border-radius:14px;padding:16px">
+                  <div style="font-size:14px;font-weight:600;margin-bottom:8px">Latest News</div>
+                  <div style="display:flex;flex-direction:column">
+                    <sc-for list="{{ latest }}" as="n" hint-placeholder-count="6">
+                      <div onClick="{{ n.onClick }}" onKeyDown="{{ n.onKey }}" role="button" tabindex="0" style="display:flex;gap:10px;padding:9px 6px;border-radius:9px;cursor:pointer;align-items:flex-start" style-hover="background:var(--hover,#1f1f23)">
+                        <span style="{{ n.dotStyle }}"></span>
+                        <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500;line-height:1.35">{{ n.headline }}</div><div style="font-size:11px;color:var(--faint,#71717a);margin-top:3px">{{ n.source }} · {{ n.time }}</div></div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ========================= MARKETS / NEWS ========================= -->
+        <sc-if value="{{ flags.isNews }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <div style="display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--border,#27272a)">
+              <sc-for list="{{ tabs }}" as="tb" hint-placeholder-count="4">
+                <button onClick="{{ tb.onClick }}" style="{{ tb.style }}">{{ tb.label }}<span style="{{ tb.countStyle }}">{{ tb.count }}</span></button>
+              </sc-for>
+            </div>
+
+            <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between">
+              <div style="position:relative;flex:1 1 260px;max-width:400px">
+                <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--faint,#71717a);display:flex">{{ searchIcon }}</span>
+                <input id="fnt-search" value="{{ query }}" onChange="{{ setQuery }}" placeholder="Search symbol or name…  ( / )" style="width:100%;padding:10px 12px 10px 38px;border-radius:10px;border:1px solid var(--border,#27272a);background:var(--input,#161618);color:var(--text,#fafafa);font-size:14px;outline:none">
+              </div>
+              <div style="font-size:12.5px;color:var(--faint,#71717a)">{{ resultCount }} instruments</div>
+            </div>
+
+            <sc-if value="{{ flags.hasCards }}" hint-placeholder-val="{{ true }}">
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:14px">
+                <sc-for list="{{ cards }}" as="c" hint-placeholder-count="8">
+                  <div onClick="{{ c.onClick }}" onKeyDown="{{ c.onKey }}" role="button" tabindex="0" style="border:1px solid var(--border,#27272a);background:var(--card,#161618);border-radius:14px;padding:15px;cursor:pointer;display:flex;flex-direction:column;gap:12px;transition:border-color .15s,transform .15s" style-hover="border-color:var(--faint,#71717a);transform:translateY(-2px)">
+                    <div style="display:flex;align-items:center;gap:11px">
+                      <span style="{{ c.badgeStyle }}">{{ c.icon }}</span>
+                      <div style="flex:1;min-width:0">
+                        <div style="font-size:14.5px;font-weight:700;font-family:'Geist Mono',monospace;letter-spacing:-.01em">{{ c.sym }}</div>
+                        <div style="font-size:12px;color:var(--faint,#71717a);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.name }}</div>
+                      </div>
+                      <button onClick="{{ c.toggleWatch }}" title="Toggle watchlist" style="{{ c.starStyle }}">{{ c.starEl }}</button>
+                    </div>
+                    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:8px">
+                      <div style="font-size:20px;font-weight:600;font-family:'Geist Mono',monospace;letter-spacing:-.01em">{{ c.price }}</div>
+                      <div style="{{ c.changeStyle }}">{{ c.arrow }} {{ c.change }}</div>
+                    </div>
+                    <svg viewBox="0 0 120 34" preserveAspectRatio="none" style="width:100%;height:38px;display:block"><polyline points="{{ c.spark }}" style="{{ c.sparkStyle }}"></polyline></svg>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ flags.noCards }}" hint-placeholder-val="{{ false }}">
+              <div style="text-align:center;padding:60px 20px;color:var(--faint,#71717a)"><div style="font-size:15px;font-weight:600;color:var(--muted,#a1a1aa)">No instruments found</div><div style="font-size:13px;margin-top:4px">Nothing matches “{{ query }}” in this market.</div></div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <!-- ========================= WATCHLIST ========================= -->
+        <sc-if value="{{ flags.isWatch }}" hint-placeholder-val="{{ false }}">
+          <sc-if value="{{ flags.hasWatch }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <span style="font-size:12.5px;color:var(--faint,#71717a);margin-right:2px">Sort by</span>
+                <sc-for list="{{ sortBtns }}" as="sb" hint-placeholder-count="3">
+                  <button onClick="{{ sb.onClick }}" style="{{ sb.style }}">{{ sb.label }}</button>
+                </sc-for>
+                <div style="flex:1"></div>
+                <button onClick="{{ goNews }}" style="{{ addBtn }}">{{ plusIcon }} Add instrument</button>
+              </div>
+              <div style="border:1px solid var(--border,#27272a);background:var(--card,#161618);border-radius:14px;overflow:hidden">
+                <sc-for list="{{ watchRows }}" as="w" hint-placeholder-count="5">
+                  <div onClick="{{ w.onClick }}" onKeyDown="{{ w.onKey }}" role="button" tabindex="0" style="display:flex;align-items:center;gap:14px;padding:13px 16px;border-top:1px solid var(--border-soft,#1f1f22);cursor:pointer" style-hover="background:var(--hover,#1f1f23)">
+                    <span style="{{ w.badgeStyle }}">{{ w.icon }}</span>
+                    <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px;font-family:'Geist Mono',monospace">{{ w.sym }}</div><div style="font-size:12px;color:var(--faint,#71717a);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ w.name }}</div></div>
+                    <svg viewBox="0 0 120 34" preserveAspectRatio="none" style="width:88px;height:30px;flex-shrink:0"><polyline points="{{ w.spark }}" style="{{ w.sparkStyle }}"></polyline></svg>
+                    <div style="text-align:right;min-width:96px"><div style="font-weight:600;font-size:14px;font-family:'Geist Mono',monospace">{{ w.price }}</div><div style="{{ w.changeStyle }}">{{ w.arrow }} {{ w.change }}</div></div>
+                    <button onClick="{{ w.toggleWatch }}" title="Remove from watchlist" style="{{ w.starStyle }}">{{ w.starEl }}</button>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ flags.noWatch }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:72px 20px;gap:14px">
+              <div style="width:64px;height:64px;border-radius:18px;background:var(--card,#161618);border:1px solid var(--border,#27272a);display:flex;align-items:center;justify-content:center;color:var(--faint,#71717a)">{{ bigStarIcon }}</div>
+              <div><div style="font-size:18px;font-weight:700">Your watchlist is empty</div><div style="font-size:14px;color:var(--muted,#a1a1aa);margin-top:4px;max-width:340px">Track the instruments you care about. Tap the star on any card to add it here.</div></div>
+              <button onClick="{{ goNews }}" style="{{ addBtn }}">{{ plusIcon }} Browse markets</button>
+            </div>
+          </sc-if>
+        </sc-if>
+
+        <!-- ========================= SETTINGS ========================= -->
+        <sc-if value="{{ flags.isSettings }}" hint-placeholder-val="{{ false }}">
+          <div style="max-width:680px;display:flex;flex-direction:column;gap:18px">
+            <section style="border:1px solid var(--border,#27272a);background:var(--card,#161618);border-radius:14px;padding:20px">
+              <h3 style="margin:0 0 4px;font-size:15px;font-weight:700">Appearance</h3>
+              <p style="margin:0 0 16px;font-size:13px;color:var(--faint,#71717a)">Choose how FNT looks on this device.</p>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
+                <div style="font-size:14px;font-weight:550">Theme</div>
+                <div style="display:flex;gap:8px">
+                  <button onClick="{{ setThemeDark }}" style="{{ seg.themeDark }}">{{ moonMini }} Dark</button>
+                  <button onClick="{{ setThemeLight }}" style="{{ seg.themeLight }}">{{ sunMini }} Light</button>
+                </div>
+              </div>
+            </section>
+
+            <section style="border:1px solid var(--border,#27272a);background:var(--card,#161618);border-radius:14px;padding:20px">
+              <h3 style="margin:0 0 4px;font-size:15px;font-weight:700">Market preferences</h3>
+              <p style="margin:0 0 16px;font-size:13px;color:var(--faint,#71717a)">Conventions used across prices and charts.</p>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
+                <div><div style="font-size:14px;font-weight:550">Up / down colors</div><div style="display:flex;gap:8px;margin-top:8px"><span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--up,#22c55e);font-weight:600">▲ Up</span><span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--down,#f87171);font-weight:600">▼ Down</span></div></div>
+                <div style="display:flex;gap:8px">
+                  <button onClick="{{ setConvWest }}" style="{{ seg.convWest }}">Green up</button>
+                  <button onClick="{{ setConvEast }}" style="{{ seg.convEast }}">Red up</button>
+                </div>
+              </div>
+            </section>
+
+            <section style="border:1px solid var(--border,#27272a);background:var(--card,#161618);border-radius:14px;padding:20px 20px 8px">
+              <h3 style="margin:0 0 4px;font-size:15px;font-weight:700">Notifications</h3>
+              <p style="margin:0 0 6px;font-size:13px;color:var(--faint,#71717a)">Manage what FNT alerts you about.</p>
+              <sc-for list="{{ notifRows }}" as="nr" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-top:1px solid var(--border-soft,#1f1f22)">
+                  <div><div style="font-size:14px;font-weight:550">{{ nr.label }}</div><div style="font-size:12.5px;color:var(--faint,#71717a);margin-top:2px">{{ nr.desc }}</div></div>
+                  <button onClick="{{ nr.onClick }}" style="{{ nr.trackStyle }}"><span style="{{ nr.knobStyle }}"></span></button>
+                </div>
+              </sc-for>
+            </section>
+
+            <section style="border:1px solid var(--border,#27272a);background:var(--card,#161618);border-radius:14px;padding:20px">
+              <h3 style="margin:0 0 8px;font-size:15px;font-weight:700">About</h3>
+              <p style="margin:0;font-size:13.5px;color:var(--muted,#a1a1aa);line-height:1.6">FNT (Financial News Tracker) is a demonstration app. Prices, charts and headlines are simulated for design purposes; the symbol price chart is powered by an embedded TradingView widget. Not investment advice.</p>
+            </section>
+          </div>
+        </sc-if>
+
+        <!-- ========================= SYMBOL ========================= -->
+        <sc-if value="{{ flags.isSymbol }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--faint,#71717a);flex-wrap:wrap">
+              <button onClick="{{ back }}" style="display:flex;align-items:center;gap:6px;padding:6px 11px 6px 8px;border-radius:9px;border:1px solid var(--border,#27272a);background:var(--card,#161618);color:var(--muted,#a1a1aa);font:inherit;font-size:13px;font-weight:500;cursor:pointer" style-hover="color:var(--text,#fafafa);border-color:var(--faint,#71717a)">{{ backIcon }} Back</button>
+              <span>Markets</span>{{ chevIcon }}<span>{{ sym.catLabel }}</span>{{ chevIcon }}<span style="color:var(--text,#fafafa);font-weight:600">{{ sym.sym }}</span>
+            </div>
+
+            <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;justify-content:space-between">
+              <div style="display:flex;gap:14px;align-items:center">
+                <span style="{{ sym.badgeStyle }}">{{ sym.icon }}</span>
+                <div>
+                  <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap"><h2 style="margin:0;font-size:22px;font-weight:700;font-family:'Geist Mono',monospace">{{ sym.sym }}</h2><span style="{{ sym.catTag }}">{{ sym.catLabel }}</span></div>
+                  <div style="color:var(--muted,#a1a1aa);font-size:14px;margin-top:3px">{{ sym.name }}</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+                <div style="text-align:right">
+                  <div style="font-size:30px;font-weight:700;font-family:'Geist Mono',monospace;letter-spacing:-.02em">{{ sym.price }}</div>
+                  <div style="{{ sym.changeStyleBig }}">{{ sym.arrow }} {{ sym.change }} today</div>
+                </div>
+                <button onClick="{{ sym.toggleWatch }}" style="{{ sym.watchBtnStyle }}">{{ sym.watchIcon }} {{ sym.watchLabel }}</button>
+              </div>
+            </div>
+
+            <div style="border:1px solid var(--border,#27272a);background:var(--card,#161618);border-radius:14px;overflow:hidden">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border,#27272a)">
+                <div style="font-size:13px;font-weight:600">Price chart</div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--faint,#71717a)"><span style="width:7px;height:7px;border-radius:50%;background:var(--up,#22c55e);animation:fnt-pulse 2s infinite"></span>Live · TradingView</div>
+              </div>
+              <iframe src="{{ sym.tvUrl }}" style="width:100%;height:clamp(360px,56vh,520px);border:0;display:block;background:var(--card2,#1c1c1f)" loading="lazy" title="Price chart"></iframe>
+            </div>
+
+            <div style="display:flex;flex-wrap:wrap;gap:18px">
+              <div style="flex:1 1 340px;min-width:0;border:1px solid var(--border,#27272a);background:var(--card,#161618);border-radius:14px;padding:18px">
+                <div style="font-size:14px;font-weight:600;margin-bottom:12px">Key statistics</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border,#27272a);border-radius:10px;overflow:hidden">
+                  <sc-for list="{{ sym.statRows }}" as="st" hint-placeholder-count="6">
+                    <div style="background:var(--card,#161618);padding:12px 14px;display:flex;justify-content:space-between;gap:8px"><span style="color:var(--muted,#a1a1aa);font-size:13px">{{ st.k }}</span><span style="font-family:'Geist Mono',monospace;font-weight:600;font-size:13px">{{ st.v }}</span></div>
+                  </sc-for>
+                </div>
+                <div style="margin-top:18px">
+                  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--faint,#71717a);margin-bottom:6px"><span>52W Low {{ sym.lo52 }}</span><span>52W High {{ sym.hi52 }}</span></div>
+                  <div style="height:6px;border-radius:4px;background:var(--hover,#1f1f23);overflow:hidden"><div style="{{ sym.rangeFill }}"></div></div>
+                </div>
+                <div style="margin-top:20px">
+                  <div style="font-size:12px;color:var(--muted,#a1a1aa);margin-bottom:8px">Volume · last 32 sessions</div>
+                  <div style="display:flex;align-items:flex-end;gap:2px;height:70px">
+                    <sc-for list="{{ sym.volBars }}" as="vb" hint-placeholder-count="24"><div style="{{ vb.style }}"></div></sc-for>
+                  </div>
+                </div>
+              </div>
+              <div style="flex:1 1 320px;min-width:0;border:1px solid var(--border,#27272a);background:var(--card,#161618);border-radius:14px;padding:18px">
+                <div style="font-size:14px;font-weight:600;margin-bottom:4px">About {{ sym.sym }}</div>
+                <p style="color:var(--muted,#a1a1aa);font-size:14px;line-height:1.65;margin:8px 0 0">{{ sym.desc }}</p>
+              </div>
+            </div>
+
+            <div style="border:1px solid var(--border,#27272a);background:var(--card,#161618);border-radius:14px;padding:18px">
+              <div style="font-size:14px;font-weight:600;margin-bottom:6px">Related news</div>
+              <div style="display:flex;flex-direction:column">
+                <sc-for list="{{ sym.relatedNews }}" as="n" hint-placeholder-count="5">
+                  <div onClick="{{ n.onClick }}" onKeyDown="{{ n.onKey }}" role="button" tabindex="0" style="display:flex;gap:14px;padding:14px 4px;border-top:1px solid var(--border-soft,#1f1f22);cursor:pointer" style-hover="background:var(--hover,#1f1f23)">
+                    <div style="flex:1;min-width:0">
+                      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><span style="{{ n.tagStyle }}">{{ n.tag }}</span><span style="font-size:11px;color:var(--faint,#71717a)">{{ n.source }} · {{ n.time }}</span></div>
+                      <div style="font-size:14.5px;font-weight:600;line-height:1.35">{{ n.headline }}</div>
+                      <div style="font-size:13px;color:var(--muted,#a1a1aa);line-height:1.5;margin-top:4px">{{ n.snippet }}</div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+      </div>
+    </main>
+  </div>
+
+  <sc-if value="{{ flags.isMobile }}" hint-placeholder-val="{{ false }}">
+    <nav style="position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;border-top:1px solid var(--border,#27272a);background:color-mix(in oklab,var(--panel,#0c0c0e) 92%, transparent);backdrop-filter:blur(12px);padding:5px 6px 9px">
+      <sc-for list="{{ navM }}" as="item" hint-placeholder-count="4">
+        <button onClick="{{ item.onClick }}" style="{{ item.style }}"><span style="display:flex">{{ item.iconEl }}</span><span>{{ item.label }}</span></button>
+      </sc-for>
+    </nav>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:860},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#22c55e&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;defaultTheme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = {
+    view: 'home', prevView: 'home', newsTab: 'crypto', activeId: 'btc',
+    theme: 'dark', convention: 'west', query: '', sortBy: 'change',
+    watchlist: ['btc','aapl','nvda','xauusd','eurusd'],
+    prefs: { priceAlerts: true, breakingNews: true, digest: false },
+    vw: 1280,
+  };
+
+  RAW = [
+    ['btc','BTC','Bitcoin','crypto',67432.18,2.34,'BINANCE:BTCUSDT','#f7931a','BTC','#fff'],
+    ['eth','ETH','Ethereum','crypto',3521.44,1.12,'BINANCE:ETHUSDT','#627eea','ETH','#fff'],
+    ['sol','SOL','Solana','crypto',168.92,5.67,'BINANCE:SOLUSDT','#14f195','SOL','#04130a'],
+    ['bnb','BNB','BNB','crypto',605.10,-0.84,'BINANCE:BNBUSDT','#f3ba2f','BNB','#1a1500'],
+    ['xrp','XRP','XRP','crypto',0.5234,3.21,'BINANCE:XRPUSDT','#23292f','XRP','#fff'],
+    ['ada','ADA','Cardano','crypto',0.4521,-1.45,'BINANCE:ADAUSDT','#0033ad','ADA','#fff'],
+    ['doge','DOGE','Dogecoin','crypto',0.1567,8.92,'BINANCE:DOGEUSDT','#c2a633','DOGE','#1a1500'],
+    ['avax','AVAX','Avalanche','crypto',38.74,-2.13,'BINANCE:AVAXUSDT','#e84142','AVAX','#fff'],
+    ['aapl','AAPL','Apple Inc.','stocks',212.45,0.87,'NASDAQ:AAPL','#1d1d1f','AAPL','#fff'],
+    ['msft','MSFT','Microsoft','stocks',441.20,1.34,'NASDAQ:MSFT','#2f6fb3','MSFT','#fff'],
+    ['nvda','NVDA','NVIDIA','stocks',128.67,3.45,'NASDAQ:NVDA','#76b900','NVDA','#04130a'],
+    ['tsla','TSLA','Tesla','stocks',248.91,-2.78,'NASDAQ:TSLA','#e31937','TSLA','#fff'],
+    ['amzn','AMZN','Amazon','stocks',186.33,0.45,'NASDAQ:AMZN','#ff9900','AMZN','#1a1500'],
+    ['googl','GOOGL','Alphabet','stocks',178.22,1.05,'NASDAQ:GOOGL','#4285f4','GOOGL','#fff'],
+    ['meta','META','Meta Platforms','stocks',503.76,-0.62,'NASDAQ:META','#0866ff','META','#fff'],
+    ['amd','AMD','AMD','stocks',162.40,2.10,'NASDAQ:AMD','#ed1c24','AMD','#fff'],
+    ['eurusd','EUR/USD','Euro · Dollar','forex',1.0842,0.12,'FX:EURUSD','#2563eb','EUR','#fff'],
+    ['gbpusd','GBP/USD','Pound · Dollar','forex',1.2734,-0.08,'FX:GBPUSD','#4f46e5','GBP','#fff'],
+    ['usdjpy','USD/JPY','Dollar · Yen','forex',157.21,0.34,'FX:USDJPY','#0891b2','JPY','#fff'],
+    ['usdchf','USD/CHF','Dollar · Franc','forex',0.8956,-0.05,'FX:USDCHF','#0d9488','CHF','#fff'],
+    ['audusd','AUD/USD','Aussie · Dollar','forex',0.6642,0.21,'FX:AUDUSD','#7c3aed','AUD','#fff'],
+    ['usdcad','USD/CAD','Dollar · Loonie','forex',1.3678,0.09,'FX:USDCAD','#db2777','CAD','#fff'],
+    ['xauusd','XAU','Gold','commodities',2334.50,0.56,'TVC:GOLD','#d4af37','Au','#1a1500'],
+    ['xagusd','XAG','Silver','commodities',29.84,1.23,'TVC:SILVER','#aab2bd','Ag','#0a0a0a'],
+    ['wti','WTI','Crude Oil','commodities',78.42,-1.15,'TVC:USOIL','#2b2b2b','Oil','#fff'],
+    ['brent','BRENT','Brent Crude','commodities',82.67,-0.94,'TVC:UKOIL','#3a3a3a','Brt','#fff'],
+    ['natgas','NG','Natural Gas','commodities',2.834,2.45,'TVC:NATURALGAS','#4aa3df','NG','#fff'],
+    ['copper','HG','Copper','commodities',4.512,0.78,'COMEX:HG1!','#b87333','Cu','#fff'],
+  ];
+
+  NEWS = [
+    {id:'n1',headline:'Bitcoin reclaims $67K as spot ETF inflows accelerate',source:'CoinDesk',time:'18m',cat:'crypto',syms:['btc'],snippet:'Institutional demand drove the largest single-day inflow in three weeks, lifting BTC back above a closely watched resistance level.'},
+    {id:'n2',headline:'Ethereum staking ratio hits record ahead of network upgrade',source:'The Block',time:'42m',cat:'crypto',syms:['eth'],snippet:'More than 28% of circulating ETH is now staked as validators position for the next protocol change.'},
+    {id:'n3',headline:'Nvidia extends rally as data-center demand outpaces supply',source:'Reuters',time:'1h',cat:'stocks',syms:['nvda'],snippet:'Analysts raised price targets after channel checks pointed to sustained orders for AI accelerators into next year.'},
+    {id:'n4',headline:'Apple unveils on-device AI features at developer conference',source:'Bloomberg',time:'2h',cat:'stocks',syms:['aapl'],snippet:'The company emphasized privacy-first, on-device processing across its core apps, sending shares modestly higher.'},
+    {id:'n5',headline:'Tesla slips after delivery guidance disappoints',source:'CNBC',time:'3h',cat:'stocks',syms:['tsla'],snippet:'Management trimmed near-term delivery expectations citing factory retooling, overshadowing margin improvements.'},
+    {id:'n6',headline:'Euro edges higher as ECB signals patience on rate cuts',source:'Financial Times',time:'1h',cat:'forex',syms:['eurusd'],snippet:'Policymakers reiterated a data-dependent stance, supporting the single currency against the dollar.'},
+    {id:'n7',headline:'Gold holds near record as investors weigh the rate path',source:'WSJ',time:'2h',cat:'commodities',syms:['xauusd'],snippet:'Safe-haven demand and steady central-bank buying kept bullion firm despite a stronger dollar.'},
+    {id:'n8',headline:'Oil dips on demand concerns despite OPEC+ supply cuts',source:'Reuters',time:'4h',cat:'commodities',syms:['wti','brent'],snippet:'Softer manufacturing data weighed on the demand outlook, offsetting an extension of voluntary cuts.'},
+    {id:'n9',headline:'Solana network activity surges on memecoin frenzy',source:'Decrypt',time:'5h',cat:'crypto',syms:['sol'],snippet:'Daily transactions hit a multi-month high as low fees draw speculative trading volume.'},
+    {id:'n10',headline:'Microsoft cloud growth tops estimates on AI demand',source:'Bloomberg',time:'6h',cat:'stocks',syms:['msft'],snippet:'Azure revenue accelerated as enterprises scaled generative-AI workloads, beating consensus.'},
+    {id:'n11',headline:'Dogecoin jumps double digits amid social-media buzz',source:'CoinDesk',time:'2h',cat:'crypto',syms:['doge'],snippet:'A renewed wave of retail interest pushed the token sharply higher on heavy volume.'},
+    {id:'n12',headline:'Pound steadies as UK inflation cools further',source:'Financial Times',time:'7h',cat:'forex',syms:['gbpusd'],snippet:'Sterling found support after price data reinforced expectations of a measured policy easing.'},
+    {id:'n13',headline:'Yen weakens past key level, intervention talk grows',source:'Reuters',time:'8h',cat:'forex',syms:['usdjpy'],snippet:'Traders remained on alert for official action as the currency tested multi-decade lows.'},
+    {id:'n14',headline:'Natural gas rebounds on hotter weather forecasts',source:'CNBC',time:'5h',cat:'commodities',syms:['natgas'],snippet:'Updated models pointed to above-normal temperatures, boosting near-term cooling demand.'},
+    {id:'n15',headline:'AMD unveils next-gen AI accelerators to challenge rivals',source:'The Verge',time:'9h',cat:'stocks',syms:['amd'],snippet:'The new lineup targets data-center customers seeking alternatives, with availability later this year.'},
+    {id:'n16',headline:'Silver outperforms gold on industrial demand hopes',source:'WSJ',time:'10h',cat:'commodities',syms:['xagusd'],snippet:'Expectations for solar and electronics demand lifted the metal faster than its safe-haven peer.'},
+  ];
+
+  DESC = {
+    btc:'Bitcoin is the first and largest cryptocurrency by market capitalization — a decentralized, fixed-supply digital store of value secured by proof-of-work.',
+    eth:'Ethereum is a programmable blockchain powering smart contracts, decentralized finance, and the majority of on-chain applications and tokens.',
+    sol:'Solana is a high-throughput proof-of-stake blockchain known for low fees and fast finality, popular for trading and consumer apps.',
+    aapl:'Apple Inc. designs consumer electronics, software and services — including iPhone, Mac and iPad — alongside a fast-growing services segment.',
+    msft:'Microsoft is a global software and cloud company whose Azure platform, productivity suite and AI investments anchor its growth.',
+    nvda:'NVIDIA designs GPUs and accelerated-computing platforms that power AI training and inference, data centers, gaming and robotics.',
+    tsla:'Tesla manufactures electric vehicles, battery storage and solar products, and develops autonomous-driving and energy software.',
+    eurusd:'EUR/USD is the world\u2019s most traded currency pair, expressing the value of the euro in US dollars. It is highly liquid and sensitive to ECB and Fed policy.',
+    xauusd:'Gold (XAU/USD) is a precious-metal safe-haven asset priced in US dollars per troy ounce, often moving inversely to real yields and the dollar.',
+    wti:'WTI crude is a light, sweet oil benchmark priced at Cushing, Oklahoma, widely used as a reference for North American energy markets.',
+  };
+
+  componentDidMount() {
+    try {
+      const t = localStorage.getItem('fnt_theme'); if (t) this.state.theme = t;
+      const c = localStorage.getItem('fnt_conv'); if (c) this.state.convention = c;
+      const w = localStorage.getItem('fnt_watch'); if (w) this.state.watchlist = JSON.parse(w);
+    } catch (e) {}
+    if (!localStorage.getItem('fnt_theme') && this.props.defaultTheme) this.state.theme = this.props.defaultTheme;
+    this._applyTheme(this.state.theme, this.state.convention);
+    this._onResize = () => this.setState({ vw: window.innerWidth });
+    window.addEventListener('resize', this._onResize);
+    this._onKey = (e) => {
+      if (e.key === '/' && document.activeElement && !/input|textarea/i.test(document.activeElement.tagName)) {
+        const el = document.getElementById('fnt-search'); if (el) { e.preventDefault(); el.focus(); }
+      }
+    };
+    window.addEventListener('keydown', this._onKey);
+    this.setState({ vw: window.innerWidth });
+  }
+  componentWillUnmount() {
+    window.removeEventListener('resize', this._onResize);
+    window.removeEventListener('keydown', this._onKey);
+  }
+
+  _applyTheme(theme, conv) {
+    if (typeof document === 'undefined') return;
+    const root = document.documentElement;
+    const dark = theme !== 'light';
+    const brand = this.props.accent || (dark ? '#22c55e' : '#16a34a');
+    const green = dark ? '#22c55e' : '#16a34a';
+    const red = dark ? '#f87171' : '#dc2626';
+    const up = conv === 'east' ? red : green;
+    const down = conv === 'east' ? green : red;
+    const P = dark
+      ? { bg:'#09090b', panel:'#0c0c0e', card:'#161618', card2:'#1c1c1f', border:'#27272a', borderSoft:'#1f1f22', text:'#fafafa', muted:'#a1a1aa', faint:'#71717a', brandText:'#04130a', hover:'#1f1f23', input:'#161618' }
+      : { bg:'#f6f6f7', panel:'#ffffff', card:'#ffffff', card2:'#fafafa', border:'#e4e4e7', borderSoft:'#efeff1', text:'#09090b', muted:'#52525b', faint:'#a1a1aa', brandText:'#ffffff', hover:'#f4f4f5', input:'#ffffff' };
+    const set = (k, v) => root.style.setProperty(k, v);
+    set('--bg',P.bg); set('--panel',P.panel); set('--card',P.card); set('--card2',P.card2);
+    set('--border',P.border); set('--border-soft',P.borderSoft); set('--text',P.text);
+    set('--muted',P.muted); set('--faint',P.faint); set('--brand',brand); set('--brand-text',P.brandText);
+    set('--hover',P.hover); set('--input',P.input); set('--up',up); set('--down',down);
+    root.style.colorScheme = dark ? 'dark' : 'light';
+  }
+
+  go = (v) => this.setState({ view: v, query: '' });
+  goNews = () => this.setState({ view: 'news', query: '' });
+  goWatch = () => this.setState({ view: 'watchlist' });
+  openSymbol = (id) => this.setState((s) => ({ view: 'symbol', prevView: s.view === 'symbol' ? s.prevView : s.view, activeId: id }));
+  back = () => this.setState((s) => ({ view: s.prevView || 'news' }));
+  setNewsTab = (t) => this.setState({ newsTab: t, query: '' });
+  setQuery = (e) => this.setState({ query: e.target.value });
+  setSort = (k) => this.setState({ sortBy: k });
+  setTheme = (t) => { this._applyTheme(t, this.state.convention); try { localStorage.setItem('fnt_theme', t); } catch(e){} this.setState({ theme: t }); };
+  toggleTheme = () => this.setTheme(this.state.theme === 'light' ? 'dark' : 'light');
+  setConvention = (c) => { this._applyTheme(this.state.theme, c); try { localStorage.setItem('fnt_conv', c); } catch(e){} this.setState({ convention: c }); };
+  togglePref = (k) => this.setState((s) => ({ prefs: { ...s.prefs, [k]: !s.prefs[k] } }));
+  toggleWatch = (id, e) => {
+    if (e && e.stopPropagation) e.stopPropagation();
+    this.setState((s) => {
+      const has = s.watchlist.includes(id);
+      const wl = has ? s.watchlist.filter((x) => x !== id) : [...s.watchlist, id];
+      try { localStorage.setItem('fnt_watch', JSON.stringify(wl)); } catch(err){}
+      return { watchlist: wl };
+    });
+  };
+
+  _assets() {
+    if (this._A) return this._A;
+    const rng = (seed) => { let s = seed % 2147483647; if (s <= 0) s += 2147483646; return () => (s = s * 16807 % 2147483647, (s - 1) / 2147483646); };
+    this._A = this.RAW.map((r, i) => {
+      const [id, sym, name, cat, price, chg, tv, bg, icon, fg] = r;
+      const rnd = rng(i * 97 + 13), n = 30, vals = []; let v = 100;
+      const drift = chg / n / 1.6;
+      for (let k = 0; k < n; k++) { v += drift + (rnd() - 0.5) * (Math.abs(chg) * 0.45 + 1.1); vals.push(v); }
+      return { id, sym, name, cat, price, chg, tv, bg, icon, fg, vals };
+    });
+    this._byId = {}; this._A.forEach((a) => (this._byId[a.id] = a));
+    return this._A;
+  }
+  _spark(vals, w = 120, h = 34) {
+    const min = Math.min(...vals), max = Math.max(...vals), r = (max - min) || 1, pad = 3;
+    return vals.map((v, i) => ((i / (vals.length - 1)) * w).toFixed(1) + ',' + (h - pad - ((v - min) / r) * (h - pad * 2)).toFixed(1)).join(' ');
+  }
+  _fmtP(v, cat) {
+    if (cat === 'forex') return v.toFixed(v < 10 ? 4 : 2);
+    if (v >= 1000) return v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (v >= 1) return v.toFixed(2);
+    return v.toFixed(4);
+  }
+  _pre(cat) { return cat === 'forex' ? '' : '$'; }
+  _fmtC(p) { return (p >= 0 ? '+' : '') + p.toFixed(2) + '%'; }
+  _cat(c) { return { crypto:'Crypto', stocks:'Stocks', forex:'Forex', commodities:'Commodities' }[c] || c; }
+  _catColor(c) { return { crypto:'#f7931a', stocks:'#3b82f6', forex:'#8b5cf6', commodities:'#d4af37' }[c] || '#888'; }
+
+  _icon(name, size = 18, sw = 2) {
+    const P = {
+      home:['M3 10.5 12 3l9 7.5','M5 9.5V21h14V9.5','M10 21v-6h4v6'],
+      news:['M16 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h13a2 2 0 0 0 2-2V8','M16 4v13a2 2 0 0 0 2 2','M8 8h5','M8 12h5','M8 16h3'],
+      star:['M12 3.2l2.5 5.2 5.7.8-4.1 4 .98 5.7L12 16.9 6.92 19.7l.98-5.7-4.1-4 5.7-.8z'],
+      settings:['M20 7h-7','M9 7H4','M15 12H4','M20 12h-1','M14 17H4','M20 17h-1','M13 7a2 2 0 1 0-4 0 2 2 0 0 0 4 0Z','M21 12a2 2 0 1 0-4 0 2 2 0 0 0 4 0Z','M16 17a2 2 0 1 0-4 0 2 2 0 0 0 4 0Z'],
+      search:['M21 21l-4.3-4.3','M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14Z'],
+      bell:['M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9','M13.7 21a2 2 0 0 1-3.4 0'],
+      back:['M19 12H5','M12 19l-7-7 7-7'],
+      plus:['M12 5v14','M5 12h14'],
+      check:['M20 6 9 17l-5-5'],
+      sun:['M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z','M12 1.5v2.5','M12 20v2.5','M4 4l1.8 1.8','M18.2 18.2 20 20','M1.5 12H4','M20 12h2.5','M4 20l1.8-1.8','M18.2 5.8 20 4'],
+      moon:['M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z'],
+      up:['M22 7 13.5 15.5 8.5 10.5 2 17','M16 7h6v6'],
+      down:['M22 17 13.5 8.5 8.5 13.5 2 7','M16 17h6v-6'],
+      chev:['M9 6l6 6-6 6'],
+    };
+    const paths = (P[name] || []).map((d, i) => React.createElement('path', { key: i, d }));
+    return React.createElement('svg', { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: sw, strokeLinecap: 'round', strokeLinejoin: 'round' }, paths);
+  }
+
+  _stats(a) {
+    const p = a.price, prev = p / (1 + a.chg / 100);
+    const high = p * (1 + Math.abs(a.chg) / 100 * 0.5 + 0.004);
+    const low = prev * (1 - Math.abs(a.chg) / 100 * 0.4 - 0.003);
+    const open = prev * (1 + (a.chg / 100) * 0.3);
+    const lo52 = p * 0.62, hi52 = p * 1.28;
+    const pos = Math.max(2, Math.min(98, ((p - lo52) / ((hi52 - lo52) || 1)) * 100));
+    const f = (v) => this._pre(a.cat) + this._fmtP(v, a.cat);
+    return {
+      rows: [['Open', f(open)], ['Prev Close', f(prev)], ['Day High', f(high)], ['Day Low', f(low)], ['52W High', f(hi52)], ['52W Low', f(lo52)]],
+      pos, lo: f(lo52), hi: f(hi52),
+    };
+  }
+  _volBars(a) {
+    let x = a.id.length * 31 + a.sym.length + 7;
+    const rnd = () => (x = Math.sin(x) * 10000, x - Math.floor(x));
+    const bars = [];
+    for (let i = 0; i < 32; i++) {
+      const up = rnd() > 0.46;
+      bars.push({ style: { flex: 1, height: (16 + rnd() * 84).toFixed(0) + '%', background: up ? 'var(--up)' : 'var(--down)', opacity: 0.5, borderRadius: '2px 2px 0 0' } });
+    }
+    return bars;
+  }
+  _tvUrl(tv, theme) {
+    const t = theme === 'light' ? 'light' : 'dark';
+    const e = encodeURIComponent(tv);
+    return 'https://s.tradingview.com/widgetembed/?frameElementId=tv_' + e + '&symbol=' + e + '&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=0&toolbarbg=' + (t === 'light' ? 'f4f4f5' : '09090b') + '&studies=%5B%5D&theme=' + t + '&style=1&timezone=Etc%2FUTC&withdateranges=1&hideideas=1';
+  }
+
+  renderVals() {
+    const s = this.state, A = this._assets(), byId = this._byId;
+    const isMobile = s.vw > 0 && s.vw < 880, isDesktop = !isMobile;
+
+    const navDef = [['home','Home','home'],['news','Markets','news'],['watchlist','Watchlist','star'],['settings','Settings','settings']];
+    const baseNav = { display:'flex', alignItems:'center', gap:'12px', width:'100%', padding:'10px 12px', borderRadius:'10px', border:'none', background:'transparent', color:'var(--muted)', font:'inherit', fontSize:'14px', fontWeight:500, cursor:'pointer', textAlign:'left' };
+    const actNav = { ...baseNav, background:'var(--hover)', color:'var(--text)', fontWeight:600 };
+    const isActive = (k) => s.view === k || (k === 'news' && s.view === 'symbol');
+    const nav = navDef.map(([k, label, ic]) => ({ key:k, label, iconEl:this._icon(ic, 18), onClick:() => this.go(k), style: isActive(k) ? actNav : baseNav }));
+    const baseM = { display:'flex', flexDirection:'column', alignItems:'center', gap:'3px', flex:1, padding:'7px 0', border:'none', background:'transparent', color:'var(--faint)', font:'inherit', fontSize:'11px', fontWeight:500, cursor:'pointer' };
+    const actM = { ...baseM, color:'var(--brand)' };
+    const navM = navDef.map(([k, label, ic]) => ({ key:k, label, iconEl:this._icon(ic, 20), onClick:() => this.go(k), style: isActive(k) ? actM : baseM }));
+
+    const chgStyle = (chg, fs) => ({ color: chg >= 0 ? 'var(--up)' : 'var(--down)', fontWeight:600, fontFamily:"'Geist Mono',monospace", fontSize: (fs || 13) + 'px' });
+    const card = (a) => {
+      const inW = s.watchlist.includes(a.id);
+      const badge = (sz) => ({ width:sz+'px', height:sz+'px', borderRadius: sz>34?'12px':'9px', background:a.bg, color:a.fg, display:'flex', alignItems:'center', justifyContent:'center', fontSize: a.icon.length>3 ? (sz>34?'10px':'8px') : (a.icon.length>2 ? (sz>34?'13px':'10px') : (sz>34?'18px':'14px')), fontWeight:700, fontFamily:"'Geist Mono',monospace", flexShrink:0, letterSpacing:'-.02em' });
+      return {
+        id:a.id, sym:a.sym, name:a.name, icon:a.icon,
+        price: this._pre(a.cat) + this._fmtP(a.price, a.cat),
+        change: this._fmtC(a.chg), arrow: a.chg >= 0 ? '\u25B2' : '\u25BC',
+        badgeStyle: badge(38), badgeSm: badge(30),
+        changeStyle: chgStyle(a.chg),
+        spark: this._spark(a.vals),
+        sparkStyle: { stroke: a.chg >= 0 ? 'var(--up)' : 'var(--down)', fill:'none', strokeWidth:'1.8', strokeLinecap:'round', strokeLinejoin:'round' },
+        starEl: this._icon('star', 16, 2),
+        starStyle: { display:'flex', alignItems:'center', justifyContent:'center', width:'30px', height:'30px', borderRadius:'8px', border:'none', cursor:'pointer', flexShrink:0, background: inW ? 'color-mix(in oklab, var(--brand) 18%, transparent)' : 'transparent', color: inW ? 'var(--brand)' : 'var(--faint)' },
+        onClick: () => this.openSymbol(a.id),
+        onKey: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.openSymbol(a.id); } },
+        toggleWatch: (e) => this.toggleWatch(a.id, e),
+      };
+    };
+    const newsItem = (nw) => {
+      const col = this._catColor(nw.cat);
+      const first = nw.syms && nw.syms[0];
+      const open = () => first ? this.openSymbol(first) : this.go('news');
+      return {
+        id:nw.id, headline:nw.headline, source:nw.source, time:nw.time, snippet:nw.snippet,
+        tag: this._cat(nw.cat),
+        tagStyle: { background:`color-mix(in oklab, ${col} 18%, transparent)`, color:col, padding:'2px 8px', borderRadius:'6px', fontSize:'10.5px', fontWeight:700, letterSpacing:'.03em', textTransform:'uppercase', whiteSpace:'nowrap' },
+        dotStyle: { width:'8px', height:'8px', borderRadius:'50%', background:col, marginTop:'5px', flexShrink:0 },
+        onClick: open,
+        onKey: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } },
+      };
+    };
+
+    const q = s.query.trim().toLowerCase();
+    const inTab = A.filter((a) => a.cat === s.newsTab);
+    const filtered = q ? inTab.filter((a) => a.sym.toLowerCase().includes(q) || a.name.toLowerCase().includes(q)) : inTab;
+    const cards = filtered.map(card);
+
+    const tabDef = [['crypto','Crypto'],['stocks','Stocks'],['forex','Forex'],['commodities','Commodities']];
+    const baseTab = { padding:'11px 14px', border:'none', background:'transparent', color:'var(--muted)', font:'inherit', fontSize:'14px', fontWeight:600, cursor:'pointer', borderBottom:'2px solid transparent', marginBottom:'-1px', display:'flex', alignItems:'center', gap:'7px' };
+    const actTab = { ...baseTab, color:'var(--text)', borderBottom:'2px solid var(--brand)' };
+    const countStyle = (active) => ({ fontSize:'11px', fontWeight:600, color: active ? 'var(--text)' : 'var(--faint)', background:'var(--hover)', padding:'1px 7px', borderRadius:'20px', fontFamily:"'Geist Mono',monospace" });
+    const tabs = tabDef.map(([k, label]) => ({ k, label, count: A.filter((a) => a.cat === k).length, onClick:() => this.setNewsTab(k), style: s.newsTab === k ? actTab : baseTab, countStyle: countStyle(s.newsTab === k) }));
+
+    const watchAssets = s.watchlist.map((id) => byId[id]).filter(Boolean);
+    let wl = [...watchAssets];
+    if (s.sortBy === 'change') wl.sort((a, b) => b.chg - a.chg);
+    else if (s.sortBy === 'price') wl.sort((a, b) => b.price - a.price);
+    else if (s.sortBy === 'name') wl.sort((a, b) => a.name.localeCompare(b.name));
+    const watchRows = wl.map(card);
+    const watchMini = wl.slice(0, 5).map(card);
+
+    const sortDef = [['change','% Change'],['price','Price'],['name','Name']];
+    const basePill = { padding:'6px 12px', borderRadius:'8px', border:'1px solid var(--border)', background:'var(--card)', color:'var(--muted)', font:'inherit', fontSize:'13px', fontWeight:600, cursor:'pointer', whiteSpace:'nowrap' };
+    const actPill = { ...basePill, background:'var(--brand)', color:'var(--brand-text)', borderColor:'var(--brand)' };
+    const sortBtns = sortDef.map(([k, label]) => ({ k, label, onClick:() => this.setSort(k), style: s.sortBy === k ? actPill : basePill }));
+    const addBtn = { display:'flex', alignItems:'center', gap:'7px', padding:'9px 14px', borderRadius:'10px', border:'none', background:'var(--brand)', color:'var(--brand-text)', font:'inherit', fontSize:'13px', fontWeight:600, cursor:'pointer' };
+
+    const sorted = [...A].sort((a, b) => b.chg - a.chg);
+    const gainers = sorted.slice(0, 4).map(card);
+    const losers = sorted.slice(-4).reverse().map(card);
+
+    const idxDef = [['S&P 500',5431.60,0.42],['Nasdaq',17688.88,0.95],['Dow Jones',38589.16,-0.15],['BTC',67432.18,2.34],['Gold',2334.50,0.56],['EUR/USD',1.0842,0.12],['Crude',78.42,-1.15],['VIX',12.66,-3.21]];
+    const indices = idxDef.map(([label, val, chg]) => ({ label, val: val >= 100 ? val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : val.toFixed(2), change: this._fmtC(chg), arrow: chg >= 0 ? '\u25B2' : '\u25BC', changeStyle: chgStyle(chg, 12) }));
+
+    const tapeIds = ['btc','eth','sol','aapl','nvda','tsla','eurusd','xauusd','wti','msft','doge','gbpusd'];
+    const tapeOne = tapeIds.map((id) => byId[id]).filter(Boolean).map((a) => ({ sym:a.sym, price:this._pre(a.cat) + this._fmtP(a.price, a.cat), change:this._fmtC(a.chg), arrow:a.chg >= 0 ? '\u25B2' : '\u25BC', changeStyle:chgStyle(a.chg, 12), onClick:() => this.openSymbol(a.id) }));
+    const tape = [...tapeOne, ...tapeOne];
+
+    let x = 7; const rnd = () => (x = Math.sin(x) * 10000, x - Math.floor(x));
+    let v = 100; const mv = [];
+    for (let i = 0; i < 60; i++) { v += (rnd() - 0.4) * 2.3; mv.push(v); }
+    const w = 1000, h = 240, mn = Math.min(...mv), mx = Math.max(...mv), rr = (mx - mn) || 1, pad = 12;
+    const pts = mv.map((val, i) => [(i / (mv.length - 1)) * w, h - pad - ((val - mn) / rr) * (h - pad * 2)]);
+    const line = 'M' + pts.map((p) => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L');
+    const mcChg = ((mv[mv.length - 1] - mv[0]) / mv[0]) * 100;
+    const mc = { line, area: line + ` L${w} ${h} L0 ${h} Z`, change: this._fmtC(mcChg), arrow: mcChg >= 0 ? '\u25B2' : '\u25BC', changeStyle: chgStyle(mcChg, 15) };
+
+    const latest = this.NEWS.slice(0, 6).map(newsItem);
+
+    let sym = null;
+    const a = byId[s.activeId] || A[0];
+    if (a) {
+      const inW = s.watchlist.includes(a.id);
+      const st = this._stats(a);
+      const col = this._catColor(a.cat);
+      sym = {
+        id:a.id, sym:a.sym, name:a.name, icon:a.icon,
+        price: this._pre(a.cat) + this._fmtP(a.price, a.cat),
+        change: this._fmtC(a.chg), arrow: a.chg >= 0 ? '\u25B2' : '\u25BC',
+        changeStyleBig: chgStyle(a.chg, 15),
+        catLabel: this._cat(a.cat),
+        catTag: { background:`color-mix(in oklab, ${col} 18%, transparent)`, color:col, padding:'3px 9px', borderRadius:'7px', fontSize:'11px', fontWeight:700, letterSpacing:'.03em', textTransform:'uppercase' },
+        badgeStyle: { width:'56px', height:'56px', borderRadius:'15px', background:a.bg, color:a.fg, display:'flex', alignItems:'center', justifyContent:'center', fontSize: a.icon.length>3 ? '14px' : (a.icon.length>2 ? '17px' : '24px'), fontWeight:700, fontFamily:"'Geist Mono',monospace", flexShrink:0, letterSpacing:'-.02em' },
+        desc: this.DESC[a.id] || `${a.name} (${a.sym}) is a ${this._cat(a.cat).toLowerCase()} instrument tracked by FNT. Live price action is shown in the chart above; this overview uses simulated reference data.`,
+        toggleWatch: (e) => this.toggleWatch(a.id, e),
+        watchIcon: inW ? this._icon('check', 17) : this._icon('plus', 17),
+        watchLabel: inW ? 'Watching' : 'Add to watchlist',
+        watchBtnStyle: inW
+          ? { display:'flex', alignItems:'center', gap:'7px', padding:'10px 16px', borderRadius:'10px', border:'1px solid var(--brand)', background:'transparent', color:'var(--brand)', font:'inherit', fontSize:'13.5px', fontWeight:600, cursor:'pointer' }
+          : { display:'flex', alignItems:'center', gap:'7px', padding:'10px 16px', borderRadius:'10px', border:'none', background:'var(--brand)', color:'var(--brand-text)', font:'inherit', fontSize:'13.5px', fontWeight:600, cursor:'pointer' },
+        statRows: st.rows.map(([k, val]) => ({ k, v: val })),
+        lo52: st.lo, hi52: st.hi,
+        rangeFill: { height:'6px', borderRadius:'4px', background:'var(--brand)', width: st.pos.toFixed(0) + '%' },
+        volBars: this._volBars(a),
+        tvUrl: this._tvUrl(a.tv, s.theme),
+        relatedNews: this.NEWS.filter((n) => (n.syms && n.syms.includes(a.id)) || n.cat === a.cat).slice(0, 6).map(newsItem),
+      };
+    }
+
+    const baseSeg = { display:'flex', alignItems:'center', gap:'7px', padding:'9px 16px', borderRadius:'9px', border:'1px solid var(--border)', background:'var(--card2)', color:'var(--muted)', font:'inherit', fontSize:'13px', fontWeight:600, cursor:'pointer' };
+    const actSeg = { ...baseSeg, background:'var(--hover)', color:'var(--text)', borderColor:'var(--faint)' };
+    const dark = s.theme !== 'light';
+    const seg = {
+      themeDark: dark ? actSeg : baseSeg, themeLight: dark ? baseSeg : actSeg,
+      convWest: s.convention === 'west' ? actSeg : baseSeg, convEast: s.convention === 'east' ? actSeg : baseSeg,
+    };
+
+    const notifDef = [['priceAlerts','Price alerts','Notify me when a watched symbol moves sharply'],['breakingNews','Breaking news','Push major headlines for my watchlist'],['digest','Daily digest','A morning summary of overnight moves']];
+    const notifRows = notifDef.map(([k, label, desc]) => {
+      const on = !!s.prefs[k];
+      return {
+        k, label, desc, onClick: () => this.togglePref(k),
+        trackStyle: { width:'42px', height:'24px', borderRadius:'14px', background: on ? 'var(--brand)' : 'var(--hover)', border:'1px solid ' + (on ? 'var(--brand)' : 'var(--border)'), position:'relative', cursor:'pointer', padding:0, flexShrink:0, transition:'background .15s' },
+        knobStyle: { position:'absolute', top:'2px', left: on ? '20px' : '2px', width:'18px', height:'18px', borderRadius:'50%', background:'#fff', transition:'left .15s', boxShadow:'0 1px 2px rgba(0,0,0,.35)' },
+      };
+    });
+
+    const titles = { home:'Overview', news:'Markets', watchlist:'Watchlist', settings:'Settings' };
+    const pageTitle = s.view === 'symbol' ? (sym ? sym.sym : 'Symbol') : (titles[s.view] || 'FNT');
+    const today = (() => { try { return new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' }); } catch(e) { return ''; } })();
+
+    return {
+      flags: {
+        isHome: s.view === 'home', isNews: s.view === 'news', isWatch: s.view === 'watchlist',
+        isSettings: s.view === 'settings', isSymbol: s.view === 'symbol',
+        isMobile, isDesktop, showTape: isDesktop,
+        hasWatch: watchAssets.length > 0, noWatch: watchAssets.length === 0,
+        hasCards: cards.length > 0, noCards: cards.length === 0,
+      },
+      nav, navM, tape, indices, mc, gainers, losers, watchMini, latest,
+      tabs, cards, query: s.query, resultCount: cards.length,
+      watchRows, sortBtns, addBtn,
+      seg, notifRows, sym,
+      pageTitle, today,
+      goNews: this.goNews, goWatch: this.goWatch, back: this.back, toggleTheme: this.toggleTheme,
+      setQuery: this.setQuery,
+      setThemeDark: () => this.setTheme('dark'), setThemeLight: () => this.setTheme('light'),
+      setConvWest: () => this.setConvention('west'), setConvEast: () => this.setConvention('east'),
+      themeIcon: this._icon(dark ? 'sun' : 'moon', 18), bellIcon: this._icon('bell', 18),
+      searchIcon: this._icon('search', 17), plusIcon: this._icon('plus', 16), backIcon: this._icon('back', 16),
+      chevIcon: this._icon('chev', 14), upIcon: this._icon('up', 15), downIcon: this._icon('down', 15),
+      moonMini: this._icon('moon', 15), sunMini: this._icon('sun', 15), bigStarIcon: this._icon('star', 30, 1.6),
+    };
+  }
+}
+</script>
+</body>
+</html>
